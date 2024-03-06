@@ -15,11 +15,11 @@
 
 import Foundation
 
-class SQLiteEventStore: NSObject, EventStore {
+public class SQLiteEventStore: NSObject, EventStore {
     private let database: Database
     private var sendLimit: Int
 
-    init(namespace: String?, limit: Int = 250) {
+    public init(namespace: String?, limit: Int = 250) {
         let namespace = namespace ?? ""
         
         // Migrate old database if it exists
@@ -36,31 +36,31 @@ class SQLiteEventStore: NSObject, EventStore {
 
     // MARK: SPEventStore implementation methods
 
-    func addEvent(_ data: Payload) {
+    public func addEvent(_ data: Payload) {
         InternalQueue.onQueuePrecondition()
         
         self.database.insertRow(data.dictionary)
     }
 
-    func removeEvent(withId storeId: Int64) -> Bool {
+    public func removeEvent(withId storeId: Int64) -> Bool {
         InternalQueue.onQueuePrecondition()
         
         return database.deleteRows(ids: [storeId])
     }
 
-    func removeEvents(withIds storeIds: [Int64]) -> Bool {
+    public func removeEvents(withIds storeIds: [Int64]) -> Bool {
         InternalQueue.onQueuePrecondition()
         
         return database.deleteRows(ids: storeIds)
     }
 
-    func removeAllEvents() -> Bool {
+    public func removeAllEvents() -> Bool {
         InternalQueue.onQueuePrecondition()
         
         return database.deleteRows()
     }
 
-    func count() -> UInt {
+    public func count() -> UInt {
         InternalQueue.onQueuePrecondition()
         
         if let count = database.countRows() {
@@ -69,7 +69,7 @@ class SQLiteEventStore: NSObject, EventStore {
         return 0
     }
 
-    func emittableEvents(withQueryLimit queryLimit: UInt) -> [EmitterEvent] {
+    public func emittableEvents(withQueryLimit queryLimit: UInt) -> [EmitterEvent] {
         InternalQueue.onQueuePrecondition()
         
         let limit = min(Int(queryLimit), sendLimit)
@@ -80,7 +80,7 @@ class SQLiteEventStore: NSObject, EventStore {
         }
     }
     
-    func removeOldEvents(maxSize: Int64, maxAge: TimeInterval) {
+    public func removeOldEvents(maxSize: Int64, maxAge: TimeInterval) {
         InternalQueue.onQueuePrecondition()
         
         return database.removeOldEvents(maxSize: maxSize, maxAge: maxAge)
